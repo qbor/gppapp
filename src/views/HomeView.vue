@@ -3,7 +3,7 @@
     <!-- 头部：欢迎语 + 月份选择 -->
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-semibold text-slate-800">{{ greeting }}，欢迎使用轻账</h2>
+        <h2 class="text-2xl font-semibold text-slate-800">{{ greeting }}，欢迎使用快计</h2>
         <p class="mt-1 text-sm text-slate-400">这是你的 {{ monthLabel }} 财务概览</p>
       </div>
       <input v-model="month" type="month" class="input w-44" />
