@@ -50,7 +50,7 @@
   .label {
     @apply mb-1.5 block text-sm font-medium text-slate-600;
   }
-  /* 导航项 */
+  /* 导航项（桌面侧边栏） */
   .nav-item {
     @apply flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-500
       transition-all duration-200 hover:bg-slate-100 hover:text-slate-800;

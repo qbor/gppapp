@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-semibold text-slate-800">账单明细</h2>
+        <h2 class="text-xl font-semibold text-slate-800 sm:text-2xl">账单明细</h2>
         <p class="mt-1 text-sm text-slate-400">共 {{ filteredBills.length }} 条记录，最新账单置顶</p>
       </div>
       <button v-if="filteredBills.length > 0" class="btn-danger" @click="showClear = true">
@@ -14,7 +14,7 @@
     </div>
 
     <!-- 筛选栏 -->
-    <div class="card animate-fade-in grid gap-4 p-5 sm:grid-cols-3">
+    <div class="card animate-fade-in grid gap-4 p-4 sm:grid-cols-3 sm:p-5">
       <div>
         <label class="label" for="f-month">按月份</label>
         <input id="f-month" v-model="filters.month" type="month" class="input" />
@@ -37,7 +37,7 @@
     </div>
 
     <!-- 账单列表 -->
-    <div class="card animate-fade-in p-5">
+    <div class="card animate-fade-in p-4 sm:p-5">
       <div v-if="isLoading" class="space-y-3">
         <div v-for="i in 5" :key="i" class="h-14 animate-pulse rounded-xl bg-slate-100"></div>
       </div>
@@ -69,7 +69,7 @@
             <li
               v-for="bill in group.list"
               :key="bill.id"
-              class="group flex items-center gap-4 rounded-xl border border-slate-100 bg-white px-4 py-3 transition-all duration-200 hover:border-slate-200 hover:shadow-card"
+              class="group flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-3.5 py-3 transition-all duration-200 hover:border-slate-200 hover:shadow-card sm:gap-4"
             >
               <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" :class="TYPE_COLOR[bill.type].bg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" :class="TYPE_COLOR[bill.type].text">
@@ -83,18 +83,18 @@
                 </p>
                 <p v-if="bill.note" class="truncate text-xs text-slate-400">{{ bill.note }}</p>
               </div>
-              <span class="num text-sm font-semibold" :class="TYPE_COLOR[bill.type].text">
+              <span class="num shrink-0 text-sm font-semibold" :class="TYPE_COLOR[bill.type].text">
                 {{ bill.type === 'expense' ? '-' : '+' }}¥{{ fmtMoney(bill.amount) }}
               </span>
 
-              <!-- 悬浮操作按钮 -->
-              <div class="flex shrink-0 gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-ocean-50 hover:text-ocean-600" title="编辑" @click="openEdit(bill)">
+              <!-- 操作按钮：桌面端 hover 显示；移动端（触屏）常显 -->
+              <div class="flex shrink-0 gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+                <button class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-ocean-50 hover:text-ocean-600 lg:h-8 lg:w-8" title="编辑" @click="openEdit(bill)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                     <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                   </svg>
                 </button>
-                <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500" title="删除" @click="openDelete(bill)">
+                <button class="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500 lg:h-8 lg:w-8" title="删除" @click="openDelete(bill)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                     <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14" />
                   </svg>

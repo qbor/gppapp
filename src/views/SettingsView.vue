@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-2xl font-semibold text-slate-800">分类与预算</h2>
+      <h2 class="text-xl font-semibold text-slate-800 sm:text-2xl">分类与预算</h2>
       <p class="mt-1 text-sm text-slate-400">自定义收支分类，配置月度预算，操作即时生效</p>
     </div>
 
     <!-- 月度预算 -->
-    <div class="card animate-fade-in p-6">
+    <div class="card animate-fade-in p-5 sm:p-6">
       <div class="mb-4 flex items-center gap-2.5">
         <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-500">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
@@ -45,9 +45,9 @@
     </div>
 
     <!-- 分类管理 -->
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-4 sm:gap-6 lg:grid-cols-2">
       <!-- 支出分类 -->
-      <div class="card animate-fade-in p-6">
+      <div class="card animate-fade-in p-5 sm:p-6">
         <div class="mb-1 flex items-center gap-2.5">
           <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-400">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
@@ -79,13 +79,14 @@
               <span class="flex-1 text-sm text-slate-700">{{ cat.name }}</span>
               <span v-if="cat.is_preset" class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-400">预设</span>
             </template>
-            <div class="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-              <button class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-ocean-50 hover:text-ocean-600" title="重命名" @click="startRename(cat)">
+            <!-- 操作按钮：桌面 hover 显示，移动端常显 -->
+            <div class="flex shrink-0 gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+              <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-ocean-50 hover:text-ocean-600" title="重命名" @click="startRename(cat)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                   <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
               </button>
-              <button v-if="!cat.is_preset" class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500" title="删除" @click="confirmDeleteCat(cat)">
+              <button v-if="!cat.is_preset" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500" title="删除" @click="confirmDeleteCat(cat)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                   <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14" />
                 </svg>
@@ -101,7 +102,7 @@
       </div>
 
       <!-- 收入分类 -->
-      <div class="card animate-fade-in p-6">
+      <div class="card animate-fade-in p-5 sm:p-6">
         <div class="mb-1 flex items-center gap-2.5">
           <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-500">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
@@ -133,13 +134,13 @@
               <span class="flex-1 text-sm text-slate-700">{{ cat.name }}</span>
               <span v-if="cat.is_preset" class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-400">预设</span>
             </template>
-            <div class="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-              <button class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-ocean-50 hover:text-ocean-600" title="重命名" @click="startRename(cat)">
+            <div class="flex shrink-0 gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+              <button class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-ocean-50 hover:text-ocean-600" title="重命名" @click="startRename(cat)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                   <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
               </button>
-              <button v-if="!cat.is_preset" class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500" title="删除" @click="confirmDeleteCat(cat)">
+              <button v-if="!cat.is_preset" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500" title="删除" @click="confirmDeleteCat(cat)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                   <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14" />
                 </svg>
@@ -156,9 +157,9 @@
     </div>
 
     <!-- 数据管理 -->
-    <div class="card animate-fade-in border-rose-100 p-6">
+    <div class="card animate-fade-in border-rose-100 p-5 sm:p-6">
       <h3 class="mb-1 font-medium text-slate-700">数据管理</h3>
-      <p class="mb-4 text-xs text-slate-400">清空本机游客数据（游客模式）/ 清空全部账单与自定义分类并恢复默认（登录模式）</p>
+      <p class="mb-4 text-xs text-slate-400">清空本机游客数据（游客模式）/ 清空全部账单与预算并恢复默认（登录模式）</p>
       <button class="btn-danger" @click="showReset = true">重置全部数据</button>
     </div>
 

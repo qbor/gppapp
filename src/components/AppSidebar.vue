@@ -1,5 +1,6 @@
 <template>
-  <aside class="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-slate-100 bg-white">
+  <!-- 桌面端左侧固定导航：< lg 尺寸下隐藏（移动端使用底部标签栏） -->
+  <aside class="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-slate-100 bg-white lg:flex">
     <!-- Logo -->
     <RouterLink to="/" class="flex items-center gap-2.5 px-6 py-6">
       <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white shadow-card">

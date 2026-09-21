@@ -3,19 +3,19 @@
     <!-- 头部：欢迎语 + 月份选择 -->
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-semibold text-slate-800">{{ greeting }}，欢迎使用快计</h2>
+        <h2 class="text-xl font-semibold text-slate-800 sm:text-2xl">{{ greeting }}，欢迎使用快计</h2>
         <p class="mt-1 text-sm text-slate-400">这是你的 {{ monthLabel }} 财务概览</p>
       </div>
-      <input v-model="month" type="month" class="input w-44" />
+      <input v-model="month" type="month" class="input w-40 sm:w-44" />
     </div>
 
     <!-- 加载骨架 -->
-    <div v-if="isLoading" class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div v-if="isLoading" class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       <div v-for="i in 4" :key="i" class="card h-32 animate-pulse bg-slate-100"></div>
     </div>
 
     <!-- 统计卡片 -->
-    <div v-else class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div v-else class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       <StatCard
         label="当月收入"
         :value="`¥ ${fmtMoney(incomeOfMonth)}`"
@@ -83,9 +83,9 @@
     </div>
 
     <!-- 图表区 -->
-    <div class="grid gap-6 xl:grid-cols-5">
+    <div class="grid gap-4 sm:gap-6 xl:grid-cols-5">
       <!-- 分类占比饼图 -->
-      <div class="card animate-fade-in p-5 xl:col-span-2">
+      <div class="card animate-fade-in p-4 sm:p-5 xl:col-span-2">
         <div class="mb-2 flex items-center justify-between">
           <h3 class="font-medium text-slate-700">分类占比</h3>
           <div class="flex rounded-lg bg-slate-100 p-0.5 text-xs">
@@ -106,14 +106,14 @@
           </div>
         </div>
         <p class="mb-2 text-xs text-slate-400">{{ monthLabel }} {{ pieType === 'expense' ? '支出' : '收入' }}分类占比</p>
-        <EChart v-if="pieOption" :option="pieOption" height="300px" />
-        <div v-if="!isLoading && pieData.length === 0" class="flex h-[300px] items-center justify-center text-sm text-slate-400">
+        <EChart v-if="pieOption" :option="pieOption" :height="pieHeight" />
+        <div v-if="!isLoading && pieData.length === 0" class="flex h-[280px] items-center justify-center text-sm text-slate-400">
           本月暂无{{ pieType === 'expense' ? '支出' : '收入' }}账单，去记一笔吧
         </div>
       </div>
 
       <!-- 趋势图 -->
-      <div class="card animate-fade-in p-5 xl:col-span-3">
+      <div class="card animate-fade-in p-4 sm:p-5 xl:col-span-3">
         <div class="mb-2 flex items-center justify-between">
           <h3 class="font-medium text-slate-700">收支趋势</h3>
           <div class="flex rounded-lg bg-slate-100 p-0.5 text-xs">
@@ -134,15 +134,15 @@
           </div>
         </div>
         <p class="mb-2 text-xs text-slate-400">{{ trendRange === '30d' ? '每日收支变化' : '每月收支变化' }}</p>
-        <EChart v-if="trendOption" :option="trendOption" height="300px" />
-        <div v-if="!isLoading && trendData.length === 0" class="flex h-[300px] items-center justify-center text-sm text-slate-400">
+        <EChart v-if="trendOption" :option="trendOption" :height="trendHeight" />
+        <div v-if="!isLoading && trendData.length === 0" class="flex h-[280px] items-center justify-center text-sm text-slate-400">
           暂无趋势数据，记录账单后这里会展示收支规律
         </div>
       </div>
     </div>
 
     <!-- 近期账单 -->
-    <div class="card animate-fade-in p-5">
+    <div class="card animate-fade-in p-4 sm:p-5">
       <div class="mb-4 flex items-center justify-between">
         <h3 class="font-medium text-slate-700">近期账单</h3>
         <RouterLink to="/transactions" class="text-sm font-medium text-ocean-500 transition-colors hover:text-ocean-600">
@@ -163,7 +163,7 @@
       </div>
 
       <ul v-else class="divide-y divide-slate-50">
-        <li v-for="bill in recentBills" :key="bill.id" class="flex items-center gap-4 py-3">
+        <li v-for="bill in recentBills" :key="bill.id" class="flex items-center gap-3 py-3 sm:gap-4">
           <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" :class="TYPE_COLOR[bill.type].bg">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" :class="TYPE_COLOR[bill.type].text">
               <path :d="bill.type === 'expense' ? 'M12 5v14M19 12l-7 7-7-7' : 'M12 19V5M5 12l7-7 7 7'" />
@@ -193,6 +193,10 @@ import { TYPE_COLOR, fmtMoney, formatMonth } from '@/lib/utils'
 const month = ref(formatMonth())
 const pieType = ref('expense')
 const trendRange = ref('30d')
+
+// 移动端图表略矮，桌面端更高
+const pieHeight = computed(() => '280px')
+const trendHeight = computed(() => '280px')
 
 // ---- 当月统计 ----
 const monthBills = computed(() => bills.value.filter((b) => b.record_date.startsWith(month.value)))

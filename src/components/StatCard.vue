@@ -8,13 +8,13 @@
       </span>
       <span>{{ label }}</span>
     </div>
-    <p class="num mt-3 text-2xl font-semibold" :class="valueClass">{{ value }}</p>
+    <p class="num mt-3 text-xl font-semibold sm:text-2xl" :class="valueClass">{{ value }}</p>
     <p v-if="hint" class="mt-1 text-xs" :class="hintClass">{{ hint }}</p>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   label: { type: String, required: true },
   value: { type: String, default: '0.00' },
   valueClass: { type: String, default: 'text-slate-800' },

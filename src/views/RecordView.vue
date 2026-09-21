@@ -1,11 +1,11 @@
 <template>
   <div class="mx-auto max-w-2xl">
     <div class="mb-6">
-      <h2 class="text-2xl font-semibold text-slate-800">记一笔</h2>
+      <h2 class="text-xl font-semibold text-slate-800 sm:text-2xl">记一笔</h2>
       <p class="mt-1 text-sm text-slate-400">记录你的每一笔收支，养成记账好习惯</p>
     </div>
 
-    <div class="card animate-fade-in p-6 sm:p-8">
+    <div class="card animate-fade-in p-5 sm:p-8">
       <!-- 收支切换 -->
       <div class="mb-6 grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1.5">
         <button
