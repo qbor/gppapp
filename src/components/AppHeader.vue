@@ -1,7 +1,7 @@
 <template>
   <!-- 移动端顶部栏：仅 < lg 显示 -->
   <header class="sticky top-0 z-40 flex items-center justify-between border-b border-slate-100 bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
-    <RouterLink to="/" class="flex items-center gap-2">
+    <!-- <RouterLink to="/" class="flex items-center gap-2">
       <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-white">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
           <rect x="3" y="6" width="18" height="13" rx="2" />
@@ -10,7 +10,14 @@
         </svg>
       </span>
       <span class="text-base font-semibold text-slate-800">快计</span>
+    </RouterLink> -->
+
+    <RouterLink to="/" class="flex items-center gap-2.5">
+      <img src="/logo.png" alt="Logo" class="h-9 w-9 rounded-xl object-cover" />
+      <span class="text-base font-semibold text-slate-800">轻账</span>
     </RouterLink>
+
+
 
     <div v-if="isLoggedIn" class="flex items-center gap-2">
       <span class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">

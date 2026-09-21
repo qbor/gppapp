@@ -2,7 +2,7 @@
   <div class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-sm animate-fade-in">
       <!-- Logo 区 -->
-      <div class="mb-8 text-center">
+      <!-- <div class="mb-8 text-center">
         <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-card-hover">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7">
             <rect x="3" y="6" width="18" height="13" rx="2" />
@@ -12,7 +12,13 @@
         </span>
         <h1 class="mt-4 text-2xl font-semibold text-slate-800">快计 · 个人财务记账</h1>
         <p class="mt-1.5 text-sm text-slate-400">记录每一笔收支，看清每一分去向</p>
-      </div>
+      </div> -->
+      <div class="mb-8 text-center">
+        <img src="/logo.png" alt="Logo" class="mx-auto h-16 w-16 rounded-2xl object-cover shadow-card-hover" />
+        <h1 class="mt-4 text-2xl font-semibold text-slate-800">快计 · 个人财务记账</h1>
+        <p class="mt-1.5 text-sm text-slate-400">记录每一笔收支，看清每一分去向</p>
+    </div>
+
 
       <!-- 登录卡片 -->
       <div class="card p-7 shadow-card-hover">
