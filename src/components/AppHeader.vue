@@ -14,7 +14,7 @@
 
     <RouterLink to="/" class="flex items-center gap-2.5">
       <img src="/logo.png" alt="Logo" class="h-9 w-9 rounded-xl object-cover" />
-      <span class="text-base font-semibold text-slate-800">轻账</span>
+      <span class="text-base font-semibold text-slate-800">快计</span>
     </RouterLink>
 
 
