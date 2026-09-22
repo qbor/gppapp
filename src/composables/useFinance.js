@@ -3,6 +3,10 @@ import { supabase } from '@/lib/supabase'
 import { loadLocalData, saveLocalData, clearLocalData } from '@/lib/storage'
 import { EXPENSE_PRESETS, INCOME_PRESETS, genId, formatDate, formatMonth } from '@/lib/utils'
 
+
+// 加这一行：取当前登录用户 id
+const currentUserId = async () => (await supabase.auth.getUser()).data.user?.id
+
 // ===== 数据层（单例）=====
 // 支持双模式：
 //   guest：所有数据保存在本机 localStorage
@@ -123,7 +127,7 @@ export async function addBill({ type, category, amount, note, record_date }) {
   if (state.mode === 'user') {
     const { data, error } = await supabase
       .from('bills')
-      .insert({ type, category, amount: bill.amount, note: bill.note, record_date })
+      .insert({ user_id: await currentUserId(), type, category, amount: bill.amount, note: bill.note, record_date })
       .select()
       .single()
     if (error) throw error
@@ -142,6 +146,7 @@ export async function updateBill(id, patch) {
       .from('bills')
       .update({ ...patch, amount: Number(patch.amount) })
       .eq('id', id)
+      .eq('user_id', await currentUserId())
       .select()
       .single()
     if (error) throw error
@@ -158,7 +163,7 @@ export async function updateBill(id, patch) {
 
 export async function deleteBill(id) {
   if (state.mode === 'user') {
-    const { error } = await supabase.from('bills').delete().eq('id', id)
+    const { error } = await supabase.from('bills').delete().eq('id', id).eq('user_id', await currentUserId())
     if (error) throw error
   } else {
     persistLocal()
@@ -184,7 +189,7 @@ export async function addCategory({ name, type }) {
   if (state.mode === 'user') {
     const { data, error } = await supabase
       .from('categories')
-      .insert({ name, type, is_preset: false, sort_order: 99 })
+      .insert({ user_id: await currentUserId(),name, type, is_preset: false, sort_order: 99 })
       .select()
       .single()
     if (error) throw error
@@ -230,7 +235,7 @@ export async function setBudget(month, amount) {
       const { error } = await supabase.from('budgets').update({ amount }).eq('id', existing.id)
       if (error) throw error
     } else {
-      const { error } = await supabase.from('budgets').insert({ month, amount })
+      const { error } = await supabase.from('budgets').insert({ user_id: await currentUserId(),month, amount })
       if (error) throw error
     }
   }
@@ -266,9 +271,9 @@ export async function resetUserData() {
     return
   }
   // RLS 下 delete 仅作用于当前用户自己的行
-  const { error: billErr } = await supabase.from('bills').delete()
+  const { error: billErr } = await supabase.from('bills').delete().eq('user_id', await currentUserId())
   if (billErr) throw billErr
-  const { error: budgetErr } = await supabase.from('budgets').delete()
+  const { error: budgetErr } = await supabase.from('budgets').delete().eq('user_id', await currentUserId())
   if (budgetErr) throw budgetErr
   state.bills = []
   state.budgets = {}
