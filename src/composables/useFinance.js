@@ -165,10 +165,9 @@ export async function deleteBill(id) {
   if (state.mode === 'user') {
     const { error } = await supabase.from('bills').delete().eq('id', id).eq('user_id', await currentUserId())
     if (error) throw error
-  } else {
-    persistLocal()
-  }
+  } 
   state.bills = state.bills.filter((b) => b.id !== id)
+  if (state.mode === 'guest')persistLocal()
 }
 
 /** 清空指定月份（当月或任意月）的账单 */
@@ -218,10 +217,9 @@ export async function deleteCategory(id) {
   if (state.mode === 'user') {
     const { error } = await supabase.from('categories').delete().eq('id', id)
     if (error) throw error
-  } else {
-    persistLocal()
-  }
+  } 
   state.categories = state.categories.filter((c) => c.id !== id)
+  if (state.mode === 'guest')persistLocal()
 }
 
 // ------------------------------------------------------------------

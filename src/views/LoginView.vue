@@ -117,16 +117,27 @@ async function handleSubmit() {
   }
 
   submitting.value = true
-  try {
-    if (mode.value === 'login') {
-      await signIn(email, password)
-      toast('登录成功，欢迎回来', 'success')
-    } else {
-      await signUp(email, password)
-      toast('注册成功，已自动登录', 'success')
-    }
+try {
+  if (mode.value === 'login') {
+    await signIn(email, password)
+    toast('登录成功，欢迎回来', 'success')
     router.push('/')
-  } catch (e) {
+  } else {
+    const { data } = await signUp(email, password)
+    if (data?.session) {
+      // 邮箱验证已关闭：注册即登录
+      toast('注册成功，已自动登录', 'success')
+      router.push('/')
+    } else {
+      // 邮箱验证已开启：需用户去邮箱点链接
+      toast('注册成功，请前往邮箱点击验证链接，验证后再登录', 'success', 6000)
+      mode.value = 'login'  // 自动切回登录页
+      form.password = ''
+      form.confirm = ''
+    }
+  }
+} catch (e) {
+
     const msg = e?.message || '操作失败，请重试'
     // Supabase 常见错误提示友好化
     if (msg.includes('Invalid login credentials')) toast('邮箱或密码错误', 'error')
