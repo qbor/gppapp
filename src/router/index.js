@@ -28,10 +28,16 @@ const routes = [
     meta: { title: '账单明细' }
   },
   {
+    path: '/debts',
+    name: 'debts',
+    component: () => import('@/views/DebtView.vue'),
+    meta: { title: '债务' }
+  },
+  {
     path: '/settings',
     name: 'settings',
     component: () => import('@/views/SettingsView.vue'),
-    meta: { title: '分类与预算' }
+    meta: { title: '设置' }
   },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]

@@ -7,7 +7,7 @@
     @apply antialiased;
   }
   body {
-    @apply bg-slate-50 text-slate-700 font-sans;
+    @apply bg-slate-50 text-slate-700 font-sans dark:bg-slate-950 dark:text-slate-300;
   }
   /* 统一数字字体 */
   .num {
@@ -18,7 +18,7 @@
 @layer components {
   /* 卡片容器 */
   .card {
-    @apply bg-white rounded-2xl shadow-card border border-slate-100;
+    @apply bg-white rounded-2xl shadow-card border border-slate-100 dark:bg-slate-900 dark:border-slate-800;
   }
   /* 主按钮 */
   .btn-primary {
@@ -32,7 +32,9 @@
     @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5
       text-sm font-medium text-slate-600 border border-slate-200 transition-all duration-200
       hover:bg-slate-50 hover:text-slate-800 active:scale-[0.98]
-      disabled:cursor-not-allowed disabled:opacity-60;
+      disabled:cursor-not-allowed disabled:opacity-60
+      dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700
+      dark:hover:bg-slate-700 dark:hover:text-slate-100;
   }
   /* 危险按钮 */
   .btn-danger {
@@ -44,18 +46,22 @@
   .input {
     @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700
       outline-none transition-all duration-200 placeholder:text-slate-400
-      focus:border-brand-400 focus:ring-4 focus:ring-brand-100;
+      focus:border-brand-400 focus:ring-4 focus:ring-brand-100
+      dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder:text-slate-500
+      dark:focus:border-brand-500 dark:focus:ring-brand-900/40;
   }
   /* 表单标签 */
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-600;
+    @apply mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-400;
   }
   /* 导航项（桌面侧边栏） */
   .nav-item {
     @apply flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-500
-      transition-all duration-200 hover:bg-slate-100 hover:text-slate-800;
+      transition-all duration-200 hover:bg-slate-100 hover:text-slate-800
+      dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200;
   }
   .nav-item-active {
-    @apply bg-brand-50 text-brand-700 hover:bg-brand-50 hover:text-brand-700;
+    @apply bg-brand-50 text-brand-700 hover:bg-brand-50 hover:text-brand-700
+      dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-900/30 dark:hover:text-brand-300;
   }
 }

@@ -2,23 +2,11 @@
   <div class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-sm animate-fade-in">
       <!-- Logo 区 -->
-      <!-- <div class="mb-8 text-center">
-        <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-card-hover">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7">
-            <rect x="3" y="6" width="18" height="13" rx="2" />
-            <path d="M3 10h18" />
-            <path d="M8 14h3" />
-          </svg>
-        </span>
-        <h1 class="mt-4 text-2xl font-semibold text-slate-800">快计 · 个人财务记账</h1>
-        <p class="mt-1.5 text-sm text-slate-400">记录每一笔收支，看清每一分去向</p>
-      </div> -->
       <div class="mb-8 text-center">
-        <img src="/logo.png" alt="Logo" class="mx-auto h-16 w-16 rounded-2xl object-cover shadow-card-hover" />
-        <h1 class="mt-4 text-2xl font-semibold text-slate-800">快计 · 个人财务记账</h1>
+        <img src="/logo.png" alt="快计" class="mx-auto h-16 w-16 rounded-2xl object-contain shadow-card-hover" />
+        <h1 class="mt-4 text-2xl font-semibold text-slate-800 dark:text-slate-100">快计 · 个人财务记账</h1>
         <p class="mt-1.5 text-sm text-slate-400">记录每一笔收支，看清每一分去向</p>
-    </div>
-
+      </div>
 
       <!-- 登录卡片 -->
       <div class="card p-7 shadow-card-hover">
@@ -90,6 +78,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { signIn, signUp } from '@/composables/useAuth'
+import { mergeLocalToCloud } from '@/composables/useMerge'
 import { toast } from '@/composables/useToast'
 
 const router = useRouter()
@@ -117,27 +106,23 @@ async function handleSubmit() {
   }
 
   submitting.value = true
-try {
-  if (mode.value === 'login') {
-    await signIn(email, password)
-    toast('登录成功，欢迎回来', 'success')
-    router.push('/')
-  } else {
-    const { data } = await signUp(email, password)
-    if (data?.session) {
-      // 邮箱验证已关闭：注册即登录
-      toast('注册成功，已自动登录', 'success')
-      router.push('/')
+  try {
+    if (mode.value === 'login') {
+      await signIn(email, password)
+      toast('登录成功，欢迎回来', 'success')
     } else {
-      // 邮箱验证已开启：需用户去邮箱点链接
-      toast('注册成功，请前往邮箱点击验证链接，验证后再登录', 'success', 6000)
-      mode.value = 'login'  // 自动切回登录页
-      form.password = ''
-      form.confirm = ''
+      await signUp(email, password)
+      toast('注册成功，已自动登录', 'success')
     }
-  }
-} catch (e) {
-
+    // 方案B：登录成功后，把游客模式的本地数据合并到云端
+    try {
+      const res = await mergeLocalToCloud()
+      if (res.merged > 0) toast(`已将游客模式 ${res.merged} 条本地账单合并到云端`, 'success')
+    } catch {
+      // 合并失败不影响登录（比如本地无数据），静默处理
+    }
+    router.push('/')
+  } catch (e) {
     const msg = e?.message || '操作失败，请重试'
     // Supabase 常见错误提示友好化
     if (msg.includes('Invalid login credentials')) toast('邮箱或密码错误', 'error')

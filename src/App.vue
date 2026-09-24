@@ -1,6 +1,6 @@
 <template>
   <!-- 独立页（登录/注册）：无侧边栏 -->
-  <div v-if="route.meta.public" class="min-h-screen bg-gradient-to-br from-brand-50 via-ocean-50 to-slate-50">
+  <div v-if="route.meta.public" class="min-h-screen bg-gradient-to-br from-brand-50 via-ocean-50 to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
     <RouterView />
     <ToastContainer />
   </div>
