@@ -73,7 +73,7 @@
               <span class="ml-1.5 text-xs text-slate-400">{{ d.direction === 'lend' ? '借出' : '借入' }}</span>
               <span v-if="d.note" class="ml-1.5 text-xs text-slate-400">{{ d.note }}</span>
             </p>
-            <p class="mt-0.5 text-xs" :class="STATUS_META[d.status].class">{{ STATUS_META[d.status].label }}</p>
+            <p class="mt-0.5 text-xs" :class="statusMeta(d.status).class">{{ statusMeta(d.status).label }}</p>
           </div>
           <span class="num shrink-0 text-sm font-semibold" :class="d.direction === 'lend' ? 'text-brand-600 dark:text-brand-300' : 'text-rose-500'">{{ d.direction === 'lend' ? '+' : '-' }}{{ currencySymbol }}{{ fmtMoney(d.amount) }}</span>
 
@@ -100,7 +100,11 @@ import { currencySymbol } from '@/composables/useSettings'
 
 const STATUS_META = {
   active: { label: '未结清', class: 'text-amber-600' },
+  pending: { label: '未结清', class: 'text-amber-600' }, // 兼容旧数据
   settled: { label: '已结清', class: 'text-ocean-600' }
+}
+function statusMeta(status) {
+  return STATUS_META[status] || STATUS_META.active
 }
 
 const form = reactive({ direction: 'lend', name: '', amount: '', note: '' })

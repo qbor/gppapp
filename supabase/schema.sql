@@ -103,9 +103,13 @@ create table if not exists public.debts (
   name        text not null,
   amount      numeric(12, 2) not null check (amount > 0),
   note        text default '',
-  status      text not null default 'pending',
+  status      text not null default 'active',
   created_at  timestamptz not null default now()
 );
+
+-- 兼容旧数据：历史 'pending' 状态统一迁移为 'active'（前端只认 active / settled）
+alter table public.debts alter column status set default 'active';
+update public.debts set status = 'active' where status = 'pending';
 
 -- ---------------------------------------------------------------------
 -- 8. 个人资料表 profiles（昵称 / 头像）

@@ -163,7 +163,7 @@
             :class="cat.type === 'expense' ? 'bg-rose-50 text-rose-600 dark:bg-rose-900/30' : 'bg-brand-50 text-brand-700 dark:bg-brand-900/30'"
           >
             {{ cat.name }}
-            <button class="text-slate-400 hover:text-rose-500" title="删除" @click="handleDeleteCategory(cat)">✕</button>
+            <button v-if="!cat.is_preset" class="text-slate-400 hover:text-rose-500" title="删除" @click="handleDeleteCategory(cat)">✕</button>
           </span>
         </div>
         <p class="mt-3 text-xs text-slate-400">预设分类和带账单的分类不可删除；自定义分类可直接删除。</p>

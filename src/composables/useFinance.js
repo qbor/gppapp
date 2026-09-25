@@ -218,6 +218,18 @@ async function applyAccountDelta(accountName, type, amount) {
   }
 }
 
+/** 撤销账单对账户余额的影响（编辑账单时先还原旧账单，方向与 apply 相反） */
+async function revertAccountDelta(accountName, type, amount) {
+  if (!accountName) return
+  const acc = state.accounts.find((a) => a.name === accountName)
+  if (!acc) return
+  const delta = type === 'expense' ? Number(amount) : -Number(amount)
+  acc.balance = Number((Number(acc.balance) + delta).toFixed(2))
+  if (state.mode === 'user') {
+    await supabase.from('accounts').update({ balance: acc.balance }).eq('id', acc.id)
+  }
+}
+
 // ------------------------------------------------------------------
 // 账单操作
 // ------------------------------------------------------------------
@@ -257,10 +269,20 @@ export async function addBill({ type, category, amount, note, record_date, tags 
 }
 
 export async function updateBill(id, patch) {
+  const bill = state.bills.find((b) => b.id === id)
+  if (!bill) return
+  // 记录旧账单信息，用于账户余额联动（编辑后先撤销旧影响，再应用新影响）
+  const oldAccount = bill.account || ''
+  const oldType = bill.type
+  const oldAmount = Number(bill.amount)
+  const newType = patch.type || oldType
+  const newAmount = patch.amount !== undefined ? Number(patch.amount) : oldAmount
+  const newAccount = patch.account !== undefined ? patch.account : oldAccount
+
   if (state.mode === 'user') {
     const { data, error } = await supabase
       .from('bills')
-      .update({ ...patch, amount: Number(patch.amount), tags: patch.tags || [], account: patch.account || '', receipt: patch.receipt || '' })
+      .update({ ...patch, amount: newAmount, tags: patch.tags || [], account: newAccount, receipt: patch.receipt || '' })
       .eq('id', id)
       .select()
       .single()
@@ -269,8 +291,16 @@ export async function updateBill(id, patch) {
     if (idx > -1) state.bills[idx] = normalizeBill(data)
   } else {
     const idx = state.bills.findIndex((b) => b.id === id)
-    if (idx === -1) return
-    state.bills[idx] = { ...state.bills[idx], ...patch, amount: Number(patch.amount), tags: patch.tags || [], account: patch.account || '', receipt: patch.receipt || '' }
+    state.bills[idx] = { ...state.bills[idx], ...patch, amount: newAmount, tags: patch.tags || [], account: newAccount, receipt: patch.receipt || '' }
+  }
+
+  // 账户余额联动：仅当账户 / 收支类型 / 金额任一变化时执行
+  if (oldAccount !== newAccount || oldType !== newType || oldAmount !== newAmount) {
+    await revertAccountDelta(oldAccount, oldType, oldAmount)
+    await applyAccountDelta(newAccount, newType, newAmount)
+  }
+
+  if (state.mode === 'guest') {
     state.bills.sort(sortBills)
     persistLocal()
   }
@@ -363,6 +393,21 @@ export async function updateCategory(id, name) {
 }
 
 export async function deleteCategory(id) {
+  // 保护：预设分类不可删除
+  const cat = state.categories.find((c) => c.id === id)
+  if (!cat) return
+  if (cat.is_preset) {
+    const err = new Error(`「${cat.name}」是系统预设分类，不可删除`)
+    err.isPreset = true
+    throw err
+  }
+  // 保护：已有账单引用的分类不可删除（账单按分类名关联）
+  const used = state.bills.some((b) => b.category === cat.name)
+  if (used) {
+    const err = new Error(`「${cat.name}」已有账单记录，不可删除`)
+    err.inUse = true
+    throw err
+  }
   if (state.mode === 'user') {
     const { error } = await supabase.from('categories').delete().eq('id', id)
     if (error) throw error
@@ -562,7 +607,7 @@ export async function checkRecurring() {
 // ------------------------------------------------------------------
 
 export async function addDebt({ direction, name, amount, note = '' }) {
-  const item = { id: genId(), direction, name, amount: Number(amount), note, status: 'pending', created_at: new Date().toISOString() }
+  const item = { id: genId(), direction, name, amount: Number(amount), note, status: 'active', created_at: new Date().toISOString() }
   if (state.mode === 'user') {
     const uid = await currentUserId()
     const { data, error } = await supabase
