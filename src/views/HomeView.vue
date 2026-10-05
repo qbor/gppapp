@@ -278,6 +278,16 @@
         </li>
       </ul>
     </div>
+
+    <!-- 备案号 -->
+    <div class="pt-2 text-center">
+      <a
+        href="https://beian.mitt.gov.cn"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-xs text-slate-400 transition-colors hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-400"
+      >蜀ICP备2026058290号-1</a>
+    </div>
   </div>
 </template>
 
