@@ -282,7 +282,7 @@
     <!-- 备案号 -->
     <div class="pt-2 text-center">
       <a
-        href="https://beian.mitt.gov.cn"
+        href="https://beian.miit.gov.cn"
         target="_blank"
         rel="noopener noreferrer"
         class="text-xs text-slate-400 transition-colors hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-400"
