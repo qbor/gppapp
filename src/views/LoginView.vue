@@ -79,7 +79,7 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { signIn, signUp } from '@/composables/useAuth'
 import { mergeLocalToCloud } from '@/composables/useMerge'
-import { toast } from '@/composables/useToast'
+import { toast, errMsg } from '@/composables/useToast'
 
 const router = useRouter()
 const mode = ref('login')
@@ -123,12 +123,13 @@ async function handleSubmit() {
     }
     router.push('/')
   } catch (e) {
-    const msg = e?.message || '操作失败，请重试'
-    // Supabase 常见错误提示友好化
+    const msg = e?.message || ''
+    // Supabase 常见错误提示友好化；其余一律显示通用文案，不暴露内部细节
     if (msg.includes('Invalid login credentials')) toast('邮箱或密码错误', 'error')
     else if (msg.includes('already registered') || msg.includes('already exists')) toast('该邮箱已注册，请直接登录', 'error')
-    else if (msg.includes('not configured')) toast(msg, 'error')
-    else toast(msg, 'error')
+    else if (msg.includes('Email not Confirmed') || msg.includes('confirm')) toast('请先前往邮箱完成验证后再登录', 'error')
+    else if (msg.includes('rate limit') || msg.includes('too many')) toast('操作过于频繁，请稍后再试', 'error')
+    else toast(errMsg(e, '登录或注册失败，请稍后重试'), 'error')
   } finally {
     submitting.value = false
   }

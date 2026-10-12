@@ -60,7 +60,7 @@ import { computed } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { isLoggedIn, signOut, userEmail } from '@/composables/useAuth'
 import { displayName, avatarUrl } from '@/composables/useSettings'
-import { toast } from '@/composables/useToast'
+import { toast, errMsg } from '@/composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
@@ -79,7 +79,7 @@ async function handleLogout() {
     toast('已退出登录，当前为游客模式', 'success')
     router.push('/')
   } catch (e) {
-    toast(e.message || '退出失败，请重试', 'error')
+    toast(errMsg(e, '退出失败，请重试'), 'error')
   }
 }
 </script>

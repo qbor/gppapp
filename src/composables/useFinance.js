@@ -363,17 +363,32 @@ export async function clearMonthBills(month) {
 // ------------------------------------------------------------------
 
 export async function addCategory({ name, type }) {
+  const trimName = String(name || '').trim()
+  if (!trimName) {
+    const err = new Error('请输入分类名称')
+    err.isBiz = true
+    throw err
+  }
+  // 同名校验：同一收支类型下不允许出现重复分类（预设 + 自定义都算）
+  const duplicated = state.categories.some(
+    (c) => c.type === type && c.name === trimName
+  )
+  if (duplicated) {
+    const err = new Error(`「${trimName}」分类已存在`)
+    err.isBiz = true
+    throw err
+  }
   if (state.mode === 'user') {
     const uid = await currentUserId()
     const { data, error } = await supabase
       .from('categories')
-      .insert({ user_id: uid, name, type, is_preset: false, sort_order: 99 })
+      .insert({ user_id: uid, name: trimName, type, is_preset: false, sort_order: 99 })
       .select()
       .single()
     if (error) throw error
     state.categories.push(data)
   } else {
-    const item = { id: genId(), name, type, is_preset: false, sort_order: 99 }
+    const item = { id: genId(), name: trimName, type, is_preset: false, sort_order: 99 }
     state.categories.push(item)
     persistLocal()
   }

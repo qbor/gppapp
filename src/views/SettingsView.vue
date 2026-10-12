@@ -253,7 +253,7 @@ import {
 } from '@/composables/useFinance'
 import { theme, currencySymbol, toggleTheme, setCurrency, saveProfile as saveSettingsProfile, displayName, nickname, avatarUrl } from '@/composables/useSettings'
 import { isLoggedIn, userEmail, resetPassword } from '@/composables/useAuth'
-import { toast } from '@/composables/useToast'
+import { toast, errMsg } from '@/composables/useToast'
 import AppModal from '@/components/AppModal.vue'
 import { ACCOUNT_ICONS, fmtMoney, formatMonth, compressImageToDataUrl } from '@/lib/utils'
 import { monthStats } from '@/composables/useStats'
@@ -294,7 +294,7 @@ async function handleSaveProfile() {
     }
     toast('资料已保存', 'success')
   } catch (err) {
-    toast(err?.message || '保存失败', 'error')
+    toast(errMsg(err, '保存失败'), 'error')
   } finally {
     profileSaving.value = false
   }
@@ -306,7 +306,7 @@ async function handleResetPassword() {
     await resetPassword(userEmail.value)
     toast('重置邮件已发送，请查收', 'success')
   } catch (err) {
-    toast(err?.message || '发送失败，稍后再试', 'error')
+    toast(errMsg(err, '发送失败，稍后再试'), 'error')
   } finally {
     resetSending.value = false
   }
@@ -349,7 +349,7 @@ async function handleAccountConfirm() {
     }
     accountModal.visible = false
   } catch (err) {
-    toast(err?.message || '保存失败', 'error')
+    toast(errMsg(err, '保存失败'), 'error')
   } finally {
     accountSaving.value = false
   }
@@ -365,7 +365,7 @@ async function handleDeleteAccountConfirm() {
     await deleteAccount(deletingAccount.value.id)
     toast('账户已删除', 'success')
   } catch (err) {
-    toast(err?.message || '删除失败', 'error')
+    toast(errMsg(err, '删除失败'), 'error')
   }
   deleteAccountVisible.value = false
 }
@@ -387,7 +387,7 @@ async function handleSaveBudget() {
     await setBudget(budgetForm.month, amount)
     toast('预算已保存', 'success')
   } catch (err) {
-    toast(err?.message || '保存失败', 'error')
+    toast(errMsg(err, '保存失败'), 'error')
   } finally {
     budgetSaving.value = false
   }
@@ -423,7 +423,7 @@ async function handleAddCategory() {
     toast('分类已添加', 'success')
     categoryForm.name = ''
   } catch (err) {
-    toast(err?.message || '添加失败', 'error')
+    toast(errMsg(err, '添加失败'), 'error')
   } finally {
     categorySaving.value = false
   }
@@ -434,7 +434,7 @@ async function handleDeleteCategory(cat) {
     await deleteCategory(cat.id)
     toast('分类已删除', 'success')
   } catch (err) {
-    toast(err?.message || '删除失败', 'error')
+    toast(errMsg(err, '删除失败'), 'error')
   }
 }
 
@@ -444,7 +444,7 @@ async function handleToggleRecurring(r) {
     await toggleRecurring(r.id)
     toast(r.enabled ? '已暂停该周期账单' : '已启用该周期账单', 'success')
   } catch (err) {
-    toast(err?.message || '操作失败', 'error')
+    toast(errMsg(err, '操作失败'), 'error')
   }
 }
 
@@ -453,7 +453,7 @@ async function handleDeleteRecurring(r) {
     await deleteRecurring(r.id)
     toast('周期账单已删除', 'success')
   } catch (err) {
-    toast(err?.message || '删除失败', 'error')
+    toast(errMsg(err, '删除失败'), 'error')
   }
 }
 
@@ -464,7 +464,7 @@ function handleExportBackup() {
     downloadJsonFile(`快计备份_${formatMonth()}.json`, data)
     toast('备份文件已导出', 'success')
   } catch (err) {
-    toast(err?.message || '导出失败', 'error')
+    toast(errMsg(err, '导出失败'), 'error')
   }
 }
 
@@ -477,7 +477,7 @@ async function handleImportBackup(e) {
     toast('备份恢复成功，页面即将刷新', 'success')
     setTimeout(() => location.reload(), 800)
   } catch (err) {
-    toast(err?.message || '恢复失败，请检查备份文件', 'error')
+    toast(errMsg(err, '恢复失败，请检查备份文件'), 'error')
   } finally {
     e.target.value = ''
   }
@@ -498,7 +498,7 @@ async function handleResetConfirm() {
     toast('数据已重置', 'success')
     setTimeout(() => location.reload(), 800)
   } catch (err) {
-    toast(err?.message || '重置失败', 'error')
+    toast(errMsg(err, '重置失败'), 'error')
   } finally {
     resetting.value = false
   }

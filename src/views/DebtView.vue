@@ -94,7 +94,7 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import { debts, isLoading, addDebt, setDebtStatus, deleteDebt } from '@/composables/useFinance'
-import { toast } from '@/composables/useToast'
+import { toast, errMsg } from '@/composables/useToast'
 import { fmtMoney } from '@/lib/utils'
 import { currencySymbol } from '@/composables/useSettings'
 
@@ -139,7 +139,7 @@ async function handleAdd() {
     form.amount = ''
     form.note = ''
   } catch (err) {
-    toast(err?.message || '保存失败，请重试', 'error')
+    toast(errMsg(err, '保存失败，请重试'), 'error')
   } finally {
     saving.value = false
   }
@@ -150,7 +150,7 @@ async function handleSetStatus(d, status) {
     await setDebtStatus(d.id, status)
     toast(status === 'settled' ? (d.direction === 'lend' ? '已标记收回' : '已标记还清') : '已恢复未结清', 'success')
   } catch (err) {
-    toast(err?.message || '操作失败', 'error')
+    toast(errMsg(err, '操作失败'), 'error')
   }
 }
 
@@ -159,7 +159,7 @@ async function handleDelete(d) {
     await deleteDebt(d.id)
     toast('记录已删除', 'success')
   } catch (err) {
-    toast(err?.message || '删除失败', 'error')
+    toast(errMsg(err, '删除失败'), 'error')
   }
 }
 </script>

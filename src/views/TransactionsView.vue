@@ -199,7 +199,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { bills, categories, accounts, isLoading, updateBill, deleteBill, clearMonthBills, restoreBill, fetchTrash, addBill } from '@/composables/useFinance'
-import { toast } from '@/composables/useToast'
+import { toast, errMsg } from '@/composables/useToast'
 import AppModal from '@/components/AppModal.vue'
 import { TYPE_COLOR, TYPE_LABEL, fmtMoney, formatDate, formatMonth, validateAmount } from '@/lib/utils'
 import { allTags } from '@/composables/useStats'
@@ -323,7 +323,7 @@ async function handleImport(e) {
     }
     toast(`导入完成，成功 ${ok} 条`, ok > 0 ? 'success' : 'error')
   } catch (err) {
-    toast(err?.message || '导入失败，请检查文件格式', 'error')
+    toast(errMsg(err, '导入失败，请检查文件格式'), 'error')
   } finally {
     e.target.value = ''
   }
