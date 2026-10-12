@@ -698,12 +698,15 @@ export async function resetUserData() {
     resetLocalData()
     return
   }
+  const uid = await currentUserId()
+  // 注意：PostgREST 禁止不带过滤条件的 delete / update（否则返回 400），
+  // 必须带 user_id 过滤；RLS 策略 auth.uid() = user_id 保证只影响当前用户的数据。
   const tables = ['bills', 'budgets', 'category_budgets', 'recurring_bills', 'debts']
   for (const t of tables) {
-    const { error } = await supabase.from(t).delete()
+    const { error } = await supabase.from(t).delete().eq('user_id', uid)
     if (error) throw error
   }
-  const { error: accErr } = await supabase.from('accounts').update({ balance: 0 })
+  const { error: accErr } = await supabase.from('accounts').update({ balance: 0 }).eq('user_id', uid)
   if (accErr) throw accErr
   state.bills = []
   state.budgets = {}

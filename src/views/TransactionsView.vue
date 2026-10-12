@@ -7,8 +7,11 @@
       </div>
       <div class="flex flex-wrap gap-2">
         <button class="btn-secondary" @click="handleExport">导出 CSV</button>
+        <button class="btn-secondary" @click="handleExportExcel">导出 Excel</button>
         <button class="btn-secondary" @click="$refs.importInput.click()">导入 CSV</button>
+        <button class="btn-secondary" @click="$refs.importExcelInput.click()">导入 Excel</button>
         <input ref="importInput" type="file" accept=".csv" class="hidden" @change="handleImport" />
+        <input ref="importExcelInput" type="file" accept=".xlsx,.xls" class="hidden" @change="handleImportExcel" />
         <button v-if="filteredBills.length > 0" class="btn-danger" @click="showClear = true">清空当月</button>
       </div>
     </div>
@@ -204,6 +207,7 @@ import AppModal from '@/components/AppModal.vue'
 import { TYPE_COLOR, TYPE_LABEL, fmtMoney, formatDate, formatMonth, validateAmount } from '@/lib/utils'
 import { allTags } from '@/composables/useStats'
 import { buildCSV, parseCSV, downloadTextFile, readFileAsText } from '@/lib/csv'
+import { downloadExcelFile, readExcelFile } from '@/lib/excel'
 
 const filters = reactive({ month: '', start: '', end: '', type: '', category: '', tag: '', search: '' })
 
@@ -284,44 +288,82 @@ function handleExport() {
   toast(`已导出 ${rows.length} 条账单`, 'success')
 }
 
+// ---- 导出 Excel ----
+function handleExportExcel() {
+  const headers = ['日期', '类型', '分类', '金额', '账户', '标签', '备注']
+  const rows = filteredBills.value.map((b) => [
+    b.record_date,
+    b.type === 'expense' ? '支出' : '收入',
+    b.category,
+    b.amount,
+    b.account || '',
+    (b.tags || []).join(' '),
+    b.note || ''
+  ])
+  if (rows.length === 0) return toast('没有可导出的账单', 'error')
+  downloadExcelFile(`账单导出_${formatDate()}.xlsx`, headers, rows)
+  toast(`已导出 ${rows.length} 条账单`, 'success')
+}
+
+/**
+ * 公共导入逻辑：把二维数组（第一行为表头）逐行写入账单
+ * 表头按中文名匹配：日期/类型/分类/金额/账户/标签/备注
+ */
+async function importRows(rows) {
+  if (rows.length < 2) return toast('文件内容为空', 'error')
+  const headers = rows[0].map((h) => String(h).trim())
+  const findIdx = (name) => headers.findIndex((h) => h.includes(name))
+  const iDate = findIdx('日期')
+  const iType = findIdx('类型')
+  const iCategory = findIdx('分类')
+  const iAmount = findIdx('金额')
+  const iAccount = findIdx('账户')
+  const iTag = findIdx('标签')
+  const iNote = findIdx('备注')
+  if (iDate < 0 || iType < 0 || iCategory < 0 || iAmount < 0) return toast('表头需要包含：日期/类型/分类/金额', 'error')
+
+  let ok = 0
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i]
+    if (!r[iDate] || !r[iAmount]) continue
+    const type = String(r[iType] || '').includes('收') ? 'income' : 'expense'
+    const amount = Number(r[iAmount])
+    if (!amount || amount <= 0) continue
+    await addBill({
+      type,
+      category: String(r[iCategory] || '其他'),
+      amount,
+      note: String(r[iNote] || ''),
+      record_date: String(r[iDate]).replace(/\//g, '-'),
+      tags: String(r[iTag] || '').split(/[\s,，]+/).filter(Boolean),
+      account: String(r[iAccount] || '')
+    })
+    ok++
+  }
+  toast(`导入完成，成功 ${ok} 条`, ok > 0 ? 'success' : 'error')
+}
+
 // ---- 导入 CSV ----
 async function handleImport(e) {
   const file = e.target.files?.[0]
   if (!file) return
   try {
     const text = await readFileAsText(file)
-    const rows = parseCSV(text)
-    if (rows.length < 2) return toast('CSV 内容为空', 'error')
-    const headers = rows[0].map((h) => h.trim())
-    const findIdx = (name) => headers.findIndex((h) => h.includes(name))
-    const iDate = findIdx('日期')
-    const iType = findIdx('类型')
-    const iCategory = findIdx('分类')
-    const iAmount = findIdx('金额')
-    const iAccount = findIdx('账户')
-    const iTag = findIdx('标签')
-    const iNote = findIdx('备注')
-    if (iDate < 0 || iType < 0 || iCategory < 0 || iAmount < 0) return toast('表头需要包含：日期/类型/分类/金额', 'error')
+    await importRows(parseCSV(text))
+  } catch (err) {
+    toast(errMsg(err, '导入失败，请检查文件格式'), 'error')
+  } finally {
+    e.target.value = ''
+  }
+}
 
-    let ok = 0
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i]
-      if (!r[iDate] || !r[iAmount]) continue
-      const type = (r[iType] || '').includes('收') ? 'income' : 'expense'
-      const amount = Number(r[iAmount])
-      if (!amount || amount <= 0) continue
-      await addBill({
-        type,
-        category: r[iCategory] || '其他',
-        amount,
-        note: r[iNote] || '',
-        record_date: r[iDate].replace(/\//g, '-'),
-        tags: (r[iTag] || '').split(/[\s,，]+/).filter(Boolean),
-        account: r[iAccount] || ''
-      })
-      ok++
-    }
-    toast(`导入完成，成功 ${ok} 条`, ok > 0 ? 'success' : 'error')
+// ---- 导入 Excel ----
+async function handleImportExcel(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  try {
+    const rows = await readExcelFile(file)
+    await importRows(rows)
   } catch (err) {
     toast(errMsg(err, '导入失败，请检查文件格式'), 'error')
   } finally {
