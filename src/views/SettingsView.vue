@@ -141,7 +141,21 @@
             <p v-else-if="cb.percent >= 80" class="mt-1.5 text-xs font-medium text-amber-600">⚠️ 已使用 80% 以上，注意控制</p>
           </div>
         </div>
-        <p v-else class="text-sm text-slate-400">还没有设置分类预算。在下方为某个分类输入预算金额，即可开启进度监控。</p>
+        <p v-else class="text-sm text-slate-400">还没有设置分类预算。设置后即可实时跟踪每个支出分类的花费进度。</p>
+
+        <!-- 分类预算设置入口 -->
+        <div class="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-100 p-3 dark:border-slate-700">
+          <select v-model="catBudgetForm.category" class="input w-44">
+            <option value="">选择支出分类</option>
+            <option v-for="c in expenseCategories" :key="c.id" :value="c.name">{{ c.name }}</option>
+          </select>
+          <div class="relative min-w-32 flex-1">
+            <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">{{ currencySymbol }}</span>
+            <input v-model="catBudgetForm.amount" type="number" min="0" step="50" class="input num !pl-8" placeholder="预算金额" />
+          </div>
+          <button class="btn-primary shrink-0" :disabled="catBudgetSaving" @click="handleSaveCategoryBudget">{{ catBudgetSaving ? '保存中…' : '保存' }}</button>
+          <button v-if="catBudgetForm.category && hasCatBudget" class="btn-danger shrink-0" :disabled="catBudgetSaving" @click="handleRemoveCategoryBudget">删除该预算</button>
+        </div>
       </div>
 
       <!-- 自定义分类 -->
@@ -410,6 +424,43 @@ const categoryBudgetList = computed(() => {
   }
   return list.sort((a, b) => b.percent - a.percent)
 })
+
+// 分类预算设置（当月）
+const catBudgetForm = reactive({ category: '', amount: '' })
+const catBudgetSaving = ref(false)
+const expenseCategories = computed(() => categories.value.filter((c) => c.type === 'expense'))
+const hasCatBudget = computed(() => Boolean(categoryBudgets.value[`${budgetForm.month}|${catBudgetForm.category}`] != null))
+
+async function handleSaveCategoryBudget() {
+  if (!catBudgetForm.category) return toast('请选择支出分类', 'error')
+  const amount = Number(catBudgetForm.amount)
+  if (!amount || amount <= 0) return toast('请输入有效的预算金额', 'error')
+  catBudgetSaving.value = true
+  try {
+    await setCategoryBudget(budgetForm.month, catBudgetForm.category, amount)
+    toast('分类预算已保存', 'success')
+    catBudgetForm.amount = ''
+  } catch (err) {
+    toast(errMsg(err, '保存失败'), 'error')
+  } finally {
+    catBudgetSaving.value = false
+  }
+}
+
+async function handleRemoveCategoryBudget() {
+  if (!catBudgetForm.category) return
+  catBudgetSaving.value = true
+  try {
+    await setCategoryBudget(budgetForm.month, catBudgetForm.category, 0)
+    toast('已删除该分类预算', 'success')
+    catBudgetForm.category = ''
+    catBudgetForm.amount = ''
+  } catch (err) {
+    toast(errMsg(err, '删除失败'), 'error')
+  } finally {
+    catBudgetSaving.value = false
+  }
+}
 
 // 自定义分类
 const categoryForm = reactive({ name: '', type: 'expense' })

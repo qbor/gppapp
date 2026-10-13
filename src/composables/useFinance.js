@@ -84,7 +84,7 @@ async function loadFromSupabase() {
   })
 
   state.bills = billsRes.data.map(normalizeBill)
-  state.categories = catesRes.data
+  state.categories = dedupeCategories(catesRes.data)
   state.budgets = toMap(budgetRes.data, 'month', 'amount')
   state.categoryBudgets = toMap(catBudgetRes.data, keyOf('month', 'category'), 'amount')
   state.accounts = accRes.data.map(normalizeAccount)
@@ -137,7 +137,7 @@ async function seedSupabaseAccounts() {
 function loadFromLocal() {
   const local = loadLocalData()
   state.bills = local.bills.filter((b) => !b.deleted_at).sort(sortBills)
-  state.categories = local.categories
+  state.categories = dedupeCategories(local.categories)
   state.budgets = local.budgets
   state.categoryBudgets = local.categoryBudgets
   state.accounts = local.accounts
@@ -147,11 +147,27 @@ function loadFromLocal() {
   if (state.categories.length === 0) {
     state.categories = seedLocalCategories()
     persistLocal()
+  } else if (state.categories.length !== local.categories.length) {
+    // 发现并清除了存量重复分类，写回本机，避免每次加载都重复计算
+    persistLocal()
   }
   if (state.accounts.length === 0) {
     state.accounts = seedLocalAccounts()
     persistLocal()
   }
+}
+
+/** 分类去重：同一收支类型下同名分类只保留第一条（预设/先创建的优先） */
+function dedupeCategories(list) {
+  const seen = new Set()
+  const out = []
+  for (const c of list || []) {
+    const key = `${c.type}|${c.name}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(c)
+  }
+  return out
 }
 
 function seedLocalCategories() {
