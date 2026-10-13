@@ -77,6 +77,17 @@ export async function resetPassword(email) {
   if (error) throw error
 }
 
+/** 重置密码流程：通过邮箱链接进入 recovery 会话后，设置新密码 */
+export async function updatePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) throw error
+}
+
+/** 当前是否处于"邮箱重置密码链接"跳转回来的 recovery 会话（URL hash 含 type=recovery） */
+export function isRecoverySession() {
+  return window.location.hash.includes('type=recovery')
+}
+
 /** 退出登录（回到游客模式） */
 export async function signOut() {
   if (isSupabaseConfigured) {

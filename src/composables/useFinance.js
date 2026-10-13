@@ -395,14 +395,31 @@ export async function addCategory({ name, type }) {
 }
 
 export async function updateCategory(id, name) {
+  const trimName = String(name || '').trim()
+  if (!trimName) {
+    const err = new Error('分类名称不能为空')
+    err.isBiz = true
+    throw err
+  }
+  const cat = state.categories.find((c) => c.id === id)
+  if (!cat) return
+  // 重命名同名校验：同收支类型下不允许改成与其他分类同名（排除自己）
+  const duplicated = state.categories.some(
+    (c) => c.id !== id && c.type === cat.type && c.name === trimName
+  )
+  if (duplicated) {
+    const err = new Error(`「${trimName}」分类已存在`)
+    err.isBiz = true
+    throw err
+  }
   if (state.mode === 'user') {
-    const { data, error } = await supabase.from('categories').update({ name }).eq('id', id).select().single()
+    const { data, error } = await supabase.from('categories').update({ name: trimName }).eq('id', id).select().single()
     if (error) throw error
     const idx = state.categories.findIndex((c) => c.id === id)
     if (idx > -1) state.categories[idx] = data
   } else {
     const idx = state.categories.findIndex((c) => c.id === id)
-    if (idx > -1) state.categories[idx].name = name
+    if (idx > -1) state.categories[idx].name = trimName
     persistLocal()
   }
 }
